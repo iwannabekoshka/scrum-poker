@@ -77,6 +77,10 @@ export class SocketService {
       revealed: room.revealed,
       task: currentTask ? currentTask.title : 'Оцените задачу'
     });
+
+    if (currentTask) {
+      socket.emit('current-task', currentTask);
+    }
   }
 
   handleVote(socket, vote) {

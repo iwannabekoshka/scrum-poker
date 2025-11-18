@@ -137,6 +137,11 @@ export const useSocket = () => {
       setTasks(tasks);
     });
 
+    socketRef.current.on('current-task', (task) => {
+      console.log('📌 Current task received:', task);
+      setCurrentTask(task);
+    });
+
     socketRef.current.on('task-added', (data) => {
       console.log('➕ Task added:', data);
       setTasks(data.tasks);
