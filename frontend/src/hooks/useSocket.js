@@ -12,6 +12,7 @@ export const useSocket = () => {
   const [taskError, setTaskError] = useState('');
   const [resetTrigger, setResetTrigger] = useState(0);
   const [currentUser, setCurrentUser] = useState(null); // Добавляем состояние текущего пользователя
+  const [joinError, setJoinError] = useState('');
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -188,6 +189,11 @@ export const useSocket = () => {
       }
     });
 
+    socketRef.current.on('join-error', (errorMessage) => {
+      console.log('❌ Join error:', errorMessage);
+      setJoinError(errorMessage);
+    });
+
     return () => {
       console.log('🧹 Cleaning up socket connection...');
       socketRef.current.disconnect();
@@ -202,6 +208,7 @@ export const useSocket = () => {
 
   const joinRoom = (roomId, username) => {
     console.log(`Joining room ${roomId} as ${username}`);
+    setJoinError('');
     socketRef.current.emit('join-room', roomId, username);
   };
 
@@ -244,6 +251,10 @@ export const useSocket = () => {
     setTaskError('');
   };
 
+  const clearJoinError = () => {
+    setJoinError('');
+  };
+
   return {
     isConnected,
     roomUsers,
@@ -254,6 +265,7 @@ export const useSocket = () => {
     taskError,
     resetTrigger,
     currentUser, // Возвращаем currentUser
+    joinError,
     joinRoom,
     vote,
     revealVotes,
@@ -262,6 +274,7 @@ export const useSocket = () => {
     deleteTask,
     selectTask,
     updateTaskTime,
-    clearTaskError
+    clearTaskError,
+    clearJoinError
   };
 };

@@ -51,29 +51,43 @@ export class SocketService {
   }
 
   handleJoinRoom(socket, roomId, username) {
-    console.log(`User ${socket.id} joining room ${roomId} as ${username}`);
-    
-    let room = this.roomService.getRoom(roomId);
-    if (!room) {
-      room = this.roomService.createRoom(roomId);
+    const normalizedRoomId = roomId?.trim();
+    const normalizedUsername = username?.trim();
+
+    if (!normalizedRoomId || !normalizedUsername) {
+      socket.emit('join-error', 'Комната и имя обязательны');
+      return;
     }
 
-    const user = new User(socket.id, username);
-    this.roomService.addUserToRoom(roomId, user);
+    console.log(`User ${socket.id} joining room ${normalizedRoomId} as ${normalizedUsername}`);
+    
+    let room = this.roomService.getRoom(normalizedRoomId);
+    if (!room) {
+      room = this.roomService.createRoom(normalizedRoomId);
+    }
 
-    socket.join(roomId);
-    socket.roomId = roomId;
-    socket.username = username;
+    const user = new User(socket.id, normalizedUsername);
 
-    const users = this.roomService.getAllUsers(roomId);
-    const tasks = this.roomService.getTasks(roomId);
-    const currentTask = this.roomService.getCurrentTask(roomId);
+    try {
+      this.roomService.addUserToRoom(normalizedRoomId, user);
+    } catch (error) {
+      socket.emit('join-error', error.message || 'Не удалось присоединиться к комнате');
+      return;
+    }
+
+    socket.join(normalizedRoomId);
+    socket.roomId = normalizedRoomId;
+    socket.username = normalizedUsername;
+
+    const users = this.roomService.getAllUsers(normalizedRoomId);
+    const tasks = this.roomService.getTasks(normalizedRoomId);
+    const currentTask = this.roomService.getCurrentTask(normalizedRoomId);
     
     console.log(`Room ${roomId} now has users:`, users.map(u => u.name));
     
-    this.io.to(roomId).emit('user-joined', users);
-    this.io.to(roomId).emit('tasks-updated', tasks);
-    this.io.to(roomId).emit('room-state', {
+    this.io.to(normalizedRoomId).emit('user-joined', users);
+    this.io.to(normalizedRoomId).emit('tasks-updated', tasks);
+    this.io.to(normalizedRoomId).emit('room-state', {
       revealed: room.revealed,
       task: currentTask ? currentTask.title : 'Оцените задачу'
     });

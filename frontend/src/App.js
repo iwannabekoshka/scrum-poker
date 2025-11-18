@@ -1,100 +1,39 @@
-import React, { useState } from 'react';
-import { useSocket } from './hooks/useSocket.js';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginScreen from './components/LoginScreen.js';
-import GameScreen from './components/GameScreen.js';
-import TaskSidebar from './components/TaskSidebar.js';
+import RoomPage from './pages/RoomPage.js';
 
-function App() {
-  const [currentScreen, setCurrentScreen] = useState('login');
-  const [roomId, setRoomId] = useState('');
-  const [username, setUsername] = useState('');
-
-  const {
-    isConnected,
-    roomUsers,
-    roomState,
-    allVoted,
-    tasks,
-    currentTask,
-    taskError,
-    resetTrigger,
-    currentUser, // Добавляем currentUser
-    joinRoom,
-    vote,
-    revealVotes,
-    resetVotes,
-    addTask,
-    deleteTask,
-    selectTask,
-    updateTaskTime,
-    clearTaskError
-  } = useSocket();
+const LandingPage = () => {
+  const navigate = useNavigate();
 
   const handleJoinRoom = (username, roomId) => {
-    setUsername(username);
-    setRoomId(roomId);
-    joinRoom(roomId, username);
-    setCurrentScreen('game');
-  };
+    if (!roomId) {
+      return;
+    }
 
-  const handleReturnToLogin = () => {
-    setCurrentScreen('login');
-    setRoomId('');
-    setUsername('');
+    navigate(`/room/${encodeURIComponent(roomId)}`, {
+      state: { username }
+    });
   };
-
-  if (currentScreen === 'login') {
-    return <LoginScreen onJoinRoom={handleJoinRoom} />;
-  }
 
   return (
-    <div className="app">
-      <div className="connection-indicator">
-        <div className="user-info">
-          Вы: <strong>{currentUser?.name}</strong>
-        </div>
-        Статус: {isConnected ? '✅ Подключено' : '❌ Отключено'}
-        {allVoted && <span style={{marginLeft: '10px', color: 'green'}}>✓ Все проголосовали</span>}
-        <button onClick={handleReturnToLogin} className="return-btn">
-          Выйти
-        </button>
-      </div>
+    <LoginScreen
+      onJoinRoom={handleJoinRoom}
+      requireRoomId={true}
+      submitLabel="Перейти в комнату"
+    />
+  );
+};
 
-      {taskError && (
-        <div className="error-notification">
-          {taskError}
-          <button onClick={clearTaskError} className="close-error">×</button>
-        </div>
-      )}
-      
-      <div className="main-layout">
-        <div className="game-area">
-          <GameScreen
-            roomId={roomId}
-            roomUsers={roomUsers}
-            roomState={roomState}
-            allVoted={allVoted}
-            currentTask={currentTask}
-            resetTrigger={resetTrigger}
-            currentUser={currentUser} // Передаем currentUser
-            onVote={vote}
-            onReveal={revealVotes}
-            onReset={resetVotes}
-          />
-        </div>
-        
-        <div className="sidebar-area">
-          <TaskSidebar
-            tasks={tasks}
-            currentTask={currentTask}
-            onAddTask={addTask}
-            onDeleteTask={deleteTask}
-            onSelectTask={selectTask}
-            onUpdateTaskTime={updateTaskTime}
-          />
-        </div>
-      </div>
-    </div>
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/room/:roomId" element={<RoomPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </Router>
   );
 }
 

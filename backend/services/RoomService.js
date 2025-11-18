@@ -23,6 +23,15 @@ export class RoomService {
   addUserToRoom(roomId, user) {
     const room = this.getRoom(roomId);
     if (room) {
+      const normalizedNewName = user.name.trim().toLowerCase();
+      const isNameTaken = Array.from(room.users.values()).some(
+        (existingUser) => existingUser.name.trim().toLowerCase() === normalizedNewName
+      );
+
+      if (isNameTaken) {
+        throw new Error('Имя уже занято в этой комнате');
+      }
+
       room.users.set(user.id, user);
     }
     return room;
