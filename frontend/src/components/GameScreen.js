@@ -3,7 +3,17 @@ import UserList from './UserList.js';
 import VotingCards from './VotingCards.js';
 import Controls from './Controls.js';
 
-const GameScreen = ({ roomId, roomUsers, roomState, allVoted, currentTask, onVote, onReveal, onReset }) => {
+const GameScreen = ({ 
+  roomId, 
+  roomUsers, 
+  roomState, 
+  allVoted, 
+  currentTask, 
+  resetTrigger, // Новый пропс
+  onVote, 
+  onReveal, 
+  onReset 
+}) => {
   const [taskTitle, setTaskTitle] = useState('Оцените задачу');
 
   useEffect(() => {
@@ -30,6 +40,7 @@ const GameScreen = ({ roomId, roomUsers, roomState, allVoted, currentTask, onVot
       <VotingCards 
         onVote={onVote} 
         revealed={roomState.revealed}
+        resetTrigger={resetTrigger} // Передаем resetTrigger
       />
 
       <Controls

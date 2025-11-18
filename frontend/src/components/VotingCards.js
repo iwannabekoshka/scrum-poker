@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const cards = [
   { value: '0', display: '0' },
@@ -15,8 +15,22 @@ const cards = [
   { value: 'coffee', display: '☕' }
 ];
 
-const VotingCards = ({ onVote, revealed }) => {
+const VotingCards = ({ onVote, revealed, resetTrigger  }) => {
   const [selectedCard, setSelectedCard] = useState(null);
+
+    // Сбрасываем выбранную карточку при новом голосовании
+  useEffect(() => {
+    if (resetTrigger) {
+      setSelectedCard(null);
+    }
+  }, [resetTrigger]);
+
+  // Также сбрасываем при изменении revealed (на случай, если resetTrigger не сработал)
+  useEffect(() => {
+    if (!revealed) {
+      setSelectedCard(null);
+    }
+  }, [revealed]);
 
   const handleCardClick = (cardValue) => {
     if (revealed) return;

@@ -10,6 +10,7 @@ export const useSocket = () => {
   const [tasks, setTasks] = useState([]);
   const [currentTask, setCurrentTask] = useState(null);
   const [taskError, setTaskError] = useState('');
+  const [resetTrigger, setResetTrigger] = useState(0); // Новое состояние для сброса
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -71,6 +72,7 @@ export const useSocket = () => {
       setRoomUsers(users);
       setRoomState(prev => ({ ...prev, revealed: false }));
       setAllVoted(false);
+      setResetTrigger(prev => prev + 1); // Триггерим сброс
     });
 
     socketRef.current.on('room-state', (state) => {
@@ -86,7 +88,6 @@ export const useSocket = () => {
       setAllVoted(allVotedCheck);
     });
 
-    // Новые обработчики для задач
     socketRef.current.on('tasks-updated', (tasks) => {
       console.log('📋 Tasks updated:', tasks);
       setTasks(tasks);
@@ -108,12 +109,12 @@ export const useSocket = () => {
       setCurrentTask(data.task);
       setRoomUsers(data.users);
       setAllVoted(false);
+      setResetTrigger(prev => prev + 1); // Триггерим сброс при выборе новой задачи
     });
 
     socketRef.current.on('task-error', (errorMessage) => {
       console.log('❌ Task error:', errorMessage);
       setTaskError(errorMessage);
-      // Автоматически скрываем ошибку через 5 секунд
       setTimeout(() => setTaskError(''), 5000);
     });
 
@@ -149,7 +150,6 @@ export const useSocket = () => {
     socketRef.current.emit('reset-votes');
   };
 
-  // Новые методы для задач
   const addTask = (taskData) => {
     console.log('Adding task:', taskData);
     socketRef.current.emit('add-task', taskData);
@@ -177,6 +177,7 @@ export const useSocket = () => {
     tasks,
     currentTask,
     taskError,
+    resetTrigger, // Возвращаем resetTrigger
     joinRoom,
     vote,
     revealVotes,

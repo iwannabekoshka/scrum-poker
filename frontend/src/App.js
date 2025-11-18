@@ -17,6 +17,7 @@ function App() {
     tasks,
     currentTask,
     taskError,
+    resetTrigger, // Получаем resetTrigger
     joinRoom,
     vote,
     revealVotes,
@@ -69,6 +70,7 @@ function App() {
             roomState={roomState}
             allVoted={allVoted}
             currentTask={currentTask}
+            resetTrigger={resetTrigger} // Передаем resetTrigger
             onVote={vote}
             onReveal={revealVotes}
             onReset={resetVotes}
