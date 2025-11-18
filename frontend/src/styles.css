@@ -1,0 +1,232 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.connection-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 10px 15px;
+  border-radius: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.return-btn {
+  background: #ff6b6b;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.return-btn:hover {
+  background: #ff5252;
+}
+
+/* Login Screen */
+.login-screen {
+  text-align: center;
+  color: white;
+  padding: 50px 20px;
+}
+
+.login-screen h1 {
+  font-size: 3em;
+  margin-bottom: 30px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.login-form {
+  background: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.login-form input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 16px;
+}
+
+.login-form button {
+  width: 100%;
+  padding: 12px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.login-form button:hover {
+  background: #5a6fd8;
+}
+
+.hint {
+  margin-top: 15px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Game Screen */
+.game-screen {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.game-header {
+  background: #667eea;
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+
+.room-id {
+  font-weight: bold;
+}
+
+.task {
+  font-size: 1.2em;
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.connection-status {
+  margin-top: 10px;
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* Users List */
+.users-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.user {
+  background: white;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  border: 2px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.user.voted {
+  border-color: #28a745;
+}
+
+.user-name {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.user-vote {
+  font-weight: bold;
+  color: #667eea;
+  font-size: 1.2em;
+}
+
+/* Voting Section */
+.voting-section {
+  padding: 20px;
+  text-align: center;
+}
+
+.cards {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 20px 0;
+}
+
+.card {
+  width: 60px;
+  height: 90px;
+  background: white;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.card:hover:not(:disabled) {
+  background: #667eea;
+  color: white;
+  transform: translateY(-5px);
+}
+
+.card.selected {
+  background: #667eea;
+  color: white;
+  transform: translateY(-5px);
+}
+
+.card:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Controls */
+.controls {
+  padding: 20px;
+  text-align: center;
+  background: #f8f9fa;
+}
+
+.control-btn {
+  padding: 12px 24px;
+  margin: 0 10px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: #5a6fd8;
+}
+
+.control-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
