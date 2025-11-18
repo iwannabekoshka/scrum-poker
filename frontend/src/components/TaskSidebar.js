@@ -1,9 +1,18 @@
 import React, { useState } from 'react';
 
-const TaskSidebar = ({ tasks, currentTask, onAddTask, onDeleteTask, onSelectTask }) => {
+const TaskSidebar = ({
+  tasks,
+  currentTask,
+  onAddTask,
+  onDeleteTask,
+  onSelectTask,
+  onUpdateTaskTime
+}) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [newTaskUrl, setNewTaskUrl] = useState('');
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editedTime, setEditedTime] = useState('');
 
   const handleAddTask = (e) => {
     e.preventDefault();
@@ -21,6 +30,42 @@ const TaskSidebar = ({ tasks, currentTask, onAddTask, onDeleteTask, onSelectTask
   const handleDeleteTask = (taskId, e) => {
     e.stopPropagation();
     onDeleteTask(taskId);
+  };
+
+  const handleStartEditTime = (task, e) => {
+    e.stopPropagation();
+    setEditingTaskId(task.id);
+    setEditedTime(
+      task.time !== null && task.time !== undefined ? task.time : ''
+    );
+  };
+
+  const handleCancelEdit = (e) => {
+    if (e) {
+      e.stopPropagation();
+    }
+    setEditingTaskId(null);
+    setEditedTime('');
+  };
+
+  const handleSubmitTime = (e, taskId) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!onUpdateTaskTime) return;
+
+    const normalizedTime =
+      editedTime === '' ? null : Number(editedTime);
+
+    onUpdateTaskTime(taskId, normalizedTime);
+    setEditingTaskId(null);
+    setEditedTime('');
+  };
+
+  const formatTime = (time) => {
+    if (time === null || time === undefined || time === '') {
+      return '—';
+    }
+    return Number(time).toFixed(2).replace(/\.?0+$/, '');
   };
 
   return (
@@ -88,6 +133,37 @@ const TaskSidebar = ({ tasks, currentTask, onAddTask, onDeleteTask, onSelectTask
                     </a>
                   </div>
                 )}
+                <div className="task-time-row">
+                  <span className="task-time-label">⏱ {formatTime(task.time)}</span>
+                  {editingTaskId === task.id ? (
+                    <form 
+                      className="task-time-form"
+                      onSubmit={(e) => handleSubmitTime(e, task.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        value={editedTime}
+                        onChange={(e) => setEditedTime(e.target.value)}
+                        placeholder="0"
+                      />
+                      <button type="submit">OK</button>
+                      <button type="button" onClick={handleCancelEdit}>
+                        ×
+                      </button>
+                    </form>
+                  ) : (
+                    <button
+                      className="edit-time-btn"
+                      onClick={(e) => handleStartEditTime(task, e)}
+                      title="Изменить время"
+                    >
+                      Изм.
+                    </button>
+                  )}
+                </div>
               </div>
               <button
                 className="delete-task-btn"

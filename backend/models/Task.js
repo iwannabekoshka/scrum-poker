@@ -4,5 +4,6 @@ export class Task {
     this.title = title;
     this.youtrackUrl = youtrackUrl;
     this.createdAt = new Date();
+    this.time = null;
   }
 }

@@ -26,6 +26,7 @@ function App() {
     addTask,
     deleteTask,
     selectTask,
+    updateTaskTime,
     clearTaskError
   } = useSocket();
 
@@ -89,6 +90,7 @@ function App() {
             onAddTask={addTask}
             onDeleteTask={deleteTask}
             onSelectTask={selectTask}
+            onUpdateTaskTime={updateTaskTime}
           />
         </div>
       </div>

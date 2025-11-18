@@ -43,6 +43,10 @@ export class SocketService {
       socket.on('select-task', (taskId) => {
         this.handleSelectTask(socket, taskId);
       });
+
+      socket.on('update-task-time', (payload) => {
+        this.handleUpdateTaskTime(socket, payload);
+      });
     });
   }
 
@@ -113,6 +117,34 @@ export class SocketService {
     this.roomService.revealVotes(roomId);
     const users = this.roomService.getAllUsers(roomId);
     this.io.to(roomId).emit('votes-revealed', users);
+
+    const currentTask = this.roomService.getCurrentTask(roomId);
+    if (currentTask) {
+      const numericVotes = users
+        .map((user) => {
+          const value = Number(user.vote);
+          return Number.isFinite(value) ? value : null;
+        })
+        .filter((value) => value !== null);
+
+      if (numericVotes.length > 0) {
+        const sum = numericVotes.reduce((acc, value) => acc + value, 0);
+        const average = sum / numericVotes.length;
+        const updatedTask = this.roomService.updateTaskTime(
+          roomId,
+          currentTask.id,
+          Number(average.toFixed(2))
+        );
+
+        if (updatedTask) {
+          const tasks = this.roomService.getTasks(roomId);
+          this.io.to(roomId).emit('task-time-updated', {
+            task: updatedTask,
+            tasks,
+          });
+        }
+      }
+    }
   }
 
   handleResetVotes(socket) {
@@ -186,5 +218,41 @@ export class SocketService {
         task: task.title
       });
     }
+  }
+
+  handleUpdateTaskTime(socket, payload) {
+    const roomId = socket.roomId;
+    if (!roomId) return;
+
+    const { taskId, time } = payload || {};
+    if (!taskId) {
+      socket.emit('task-error', 'Task ID is required to update time');
+      return;
+    }
+
+    const normalizedTime =
+      time === null || time === '' ? null : Number(time);
+
+    if (normalizedTime !== null && !Number.isFinite(normalizedTime)) {
+      socket.emit('task-error', 'Время должно быть числом');
+      return;
+    }
+
+    const updatedTask = this.roomService.updateTaskTime(
+      roomId,
+      taskId,
+      normalizedTime
+    );
+
+    if (!updatedTask) {
+      socket.emit('task-error', 'Не удалось обновить время задачи');
+      return;
+    }
+
+    const tasks = this.roomService.getTasks(roomId);
+    this.io.to(roomId).emit('task-time-updated', {
+      task: updatedTask,
+      tasks,
+    });
   }
 }

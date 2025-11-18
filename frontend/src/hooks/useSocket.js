@@ -169,6 +169,20 @@ export const useSocket = () => {
       setTimeout(() => setTaskError(''), 5000);
     });
 
+    socketRef.current.on('task-time-updated', (data) => {
+      console.log('⏱ Task time updated:', data);
+
+      if (data?.tasks) {
+        setTasks(data.tasks);
+      }
+
+      if (data?.task) {
+        setCurrentTask((prev) =>
+          prev && prev.id === data.task.id ? data.task : prev
+        );
+      }
+    });
+
     return () => {
       console.log('🧹 Cleaning up socket connection...');
       socketRef.current.disconnect();
@@ -216,6 +230,11 @@ export const useSocket = () => {
     socketRef.current.emit('select-task', taskId);
   };
 
+  const updateTaskTime = (taskId, time) => {
+    console.log('Updating task time:', taskId, time);
+    socketRef.current.emit('update-task-time', { taskId, time });
+  };
+
   const clearTaskError = () => {
     setTaskError('');
   };
@@ -237,6 +256,7 @@ export const useSocket = () => {
     addTask,
     deleteTask,
     selectTask,
+    updateTaskTime,
     clearTaskError
   };
 };

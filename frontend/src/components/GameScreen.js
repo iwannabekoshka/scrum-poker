@@ -16,6 +16,12 @@ const GameScreen = ({
   onReset 
 }) => {
   const [taskTitle, setTaskTitle] = useState('Оцените задачу');
+  const formatTime = (time) => {
+    if (time === null || time === undefined || time === '') {
+      return '—';
+    }
+    return Number(time).toFixed(2).replace(/\.?0+$/, '');
+  };
 
   useEffect(() => {
     if (currentTask) {
@@ -30,6 +36,9 @@ const GameScreen = ({
       <header className="game-header">
         <h2>Комната: <span className="room-id">{roomId}</span></h2>
         <div className="task">{taskTitle}</div>
+        <div className="task-time">
+          ⏱ Оценка: {currentTask ? formatTime(currentTask.time) : '—'}
+        </div>
         <div className="connection-status">
           Участников: {roomUsers.length}
           {allVoted && !roomState.revealed && ' • Все проголосовали!'}

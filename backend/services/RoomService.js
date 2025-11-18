@@ -135,4 +135,24 @@ export class RoomService {
     const room = this.getRoom(roomId);
     return room ? room.currentTask : null;
   }
+
+  updateTaskTime(roomId, taskId, timeValue) {
+    const room = this.getRoom(roomId);
+    if (!room) {
+      return null;
+    }
+
+    const task = room.tasks.find((t) => t.id === taskId);
+    if (!task) {
+      return null;
+    }
+
+    task.time = timeValue;
+
+    if (room.currentTask && room.currentTask.id === taskId) {
+      room.currentTask.time = timeValue;
+    }
+
+    return task;
+  }
 }
