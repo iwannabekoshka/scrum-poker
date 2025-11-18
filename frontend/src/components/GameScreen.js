@@ -9,7 +9,8 @@ const GameScreen = ({
   roomState, 
   allVoted, 
   currentTask, 
-  resetTrigger, // Новый пропс
+  resetTrigger,
+  currentUser, // Добавляем currentUser
   onVote, 
   onReveal, 
   onReset 
@@ -35,12 +36,16 @@ const GameScreen = ({
         </div>
       </header>
 
-      <UserList users={roomUsers} revealed={roomState.revealed} />
+      <UserList 
+        users={roomUsers} 
+        revealed={roomState.revealed} 
+        currentUser={currentUser} // Передаем currentUser
+      />
 
       <VotingCards 
         onVote={onVote} 
         revealed={roomState.revealed}
-        resetTrigger={resetTrigger} // Передаем resetTrigger
+        resetTrigger={resetTrigger}
       />
 
       <Controls

@@ -10,7 +10,8 @@ export const useSocket = () => {
   const [tasks, setTasks] = useState([]);
   const [currentTask, setCurrentTask] = useState(null);
   const [taskError, setTaskError] = useState('');
-  const [resetTrigger, setResetTrigger] = useState(0); // Новое состояние для сброса
+  const [resetTrigger, setResetTrigger] = useState(0);
+  const [currentUser, setCurrentUser] = useState(null); // Добавляем состояние текущего пользователя
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -29,6 +30,14 @@ export const useSocket = () => {
     socketRef.current.on('user-joined', (users) => {
       console.log('👥 Users updated:', users);
       setRoomUsers(users);
+      
+      // Находим текущего пользователя по socket.id
+      const currentUser = users.find(user => user.id === socketRef.current.id);
+      if (currentUser) {
+        console.log('👤 Current user identified:', currentUser.name);
+        setCurrentUser(currentUser);
+      }
+      
       const allVotedCheck = users.length > 0 && users.every(user => user.voted);
       console.log('All voted after user joined:', allVotedCheck);
       setAllVoted(allVotedCheck);
@@ -39,11 +48,25 @@ export const useSocket = () => {
       
       if (data && data.users) {
         setRoomUsers(data.users);
+        
+        // Обновляем текущего пользователя
+        const currentUser = data.users.find(user => user.id === socketRef.current.id);
+        if (currentUser) {
+          setCurrentUser(currentUser);
+        }
+        
         const allVotedCheck = data.users.length > 0 && data.users.every(user => user.voted);
         console.log('All voted check (new format):', allVotedCheck);
         setAllVoted(allVotedCheck);
       } else if (Array.isArray(data)) {
         setRoomUsers(data);
+        
+        // Обновляем текущего пользователя
+        const currentUser = data.find(user => user.id === socketRef.current.id);
+        if (currentUser) {
+          setCurrentUser(currentUser);
+        }
+        
         const allVotedCheck = data.length > 0 && data.every(user => user.voted);
         console.log('All voted check (array format):', allVotedCheck);
         setAllVoted(allVotedCheck);
@@ -63,6 +86,13 @@ export const useSocket = () => {
     socketRef.current.on('votes-revealed', (users) => {
       console.log('🃏 Votes revealed');
       setRoomUsers(users);
+      
+      // Обновляем текущего пользователя
+      const currentUser = users.find(user => user.id === socketRef.current.id);
+      if (currentUser) {
+        setCurrentUser(currentUser);
+      }
+      
       setRoomState(prev => ({ ...prev, revealed: true }));
       setAllVoted(true);
     });
@@ -70,9 +100,16 @@ export const useSocket = () => {
     socketRef.current.on('votes-reset', (users) => {
       console.log('🔄 Votes reset');
       setRoomUsers(users);
+      
+      // Обновляем текущего пользователя
+      const currentUser = users.find(user => user.id === socketRef.current.id);
+      if (currentUser) {
+        setCurrentUser(currentUser);
+      }
+      
       setRoomState(prev => ({ ...prev, revealed: false }));
       setAllVoted(false);
-      setResetTrigger(prev => prev + 1); // Триггерим сброс
+      setResetTrigger(prev => prev + 1);
     });
 
     socketRef.current.on('room-state', (state) => {
@@ -83,6 +120,13 @@ export const useSocket = () => {
     socketRef.current.on('user-left', (users) => {
       console.log('👋 User left, remaining users:', users);
       setRoomUsers(users);
+      
+      // Обновляем текущего пользователя
+      const currentUser = users.find(user => user.id === socketRef.current.id);
+      if (currentUser) {
+        setCurrentUser(currentUser);
+      }
+      
       const allVotedCheck = users.length > 0 && users.every(user => user.voted);
       console.log('All voted after user left:', allVotedCheck);
       setAllVoted(allVotedCheck);
@@ -108,8 +152,15 @@ export const useSocket = () => {
       console.log('🎯 Task selected:', data);
       setCurrentTask(data.task);
       setRoomUsers(data.users);
+      
+      // Обновляем текущего пользователя
+      const currentUser = data.users.find(user => user.id === socketRef.current.id);
+      if (currentUser) {
+        setCurrentUser(currentUser);
+      }
+      
       setAllVoted(false);
-      setResetTrigger(prev => prev + 1); // Триггерим сброс при выборе новой задачи
+      setResetTrigger(prev => prev + 1);
     });
 
     socketRef.current.on('task-error', (errorMessage) => {
@@ -177,7 +228,8 @@ export const useSocket = () => {
     tasks,
     currentTask,
     taskError,
-    resetTrigger, // Возвращаем resetTrigger
+    resetTrigger,
+    currentUser, // Возвращаем currentUser
     joinRoom,
     vote,
     revealVotes,

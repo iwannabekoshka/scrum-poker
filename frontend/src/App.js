@@ -17,7 +17,8 @@ function App() {
     tasks,
     currentTask,
     taskError,
-    resetTrigger, // Получаем resetTrigger
+    resetTrigger,
+    currentUser, // Добавляем currentUser
     joinRoom,
     vote,
     revealVotes,
@@ -48,6 +49,9 @@ function App() {
   return (
     <div className="app">
       <div className="connection-indicator">
+        <div className="user-info">
+          Вы: <strong>{currentUser?.name}</strong>
+        </div>
         Статус: {isConnected ? '✅ Подключено' : '❌ Отключено'}
         {allVoted && <span style={{marginLeft: '10px', color: 'green'}}>✓ Все проголосовали</span>}
         <button onClick={handleReturnToLogin} className="return-btn">
@@ -70,7 +74,8 @@ function App() {
             roomState={roomState}
             allVoted={allVoted}
             currentTask={currentTask}
-            resetTrigger={resetTrigger} // Передаем resetTrigger
+            resetTrigger={resetTrigger}
+            currentUser={currentUser} // Передаем currentUser
             onVote={vote}
             onReveal={revealVotes}
             onReset={resetVotes}
@@ -86,7 +91,7 @@ function App() {
             onSelectTask={selectTask}
           />
         </div>
-      </div>      
+      </div>
     </div>
   );
 }
