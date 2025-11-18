@@ -1,4 +1,5 @@
-import { Room } from '../models/Room.js';
+import { Room } from "../models/Room.js";
+import { Task } from '../models/Task.js';
 
 export class RoomService {
   constructor() {
@@ -74,5 +75,64 @@ export class RoomService {
       return Array.from(room.users.values());
     }
     return [];
+  }
+
+  addTask(roomId, taskTitle, youtrackUrl) {
+    const room = this.getRoom(roomId);
+    if (room) {
+      const taskId = Date.now().toString(); // Простой ID на основе времени
+      const task = new Task(taskId, taskTitle, youtrackUrl);
+      room.tasks.push(task);
+      return task;
+    }
+    return null;
+  }
+
+  deleteTask(roomId, taskId) {
+    const room = this.getRoom(roomId);
+    if (room) {
+      // Нельзя удалить задачу, если она текущая и идет голосование
+      if (
+        room.currentTask &&
+        room.currentTask.id === taskId &&
+        !room.revealed
+      ) {
+        throw new Error("Cannot delete task that is currently being voted on");
+      }
+
+      room.tasks = room.tasks.filter((task) => task.id !== taskId);
+
+      // Если удаляемая задача была текущей, сбрасываем currentTask
+      if (room.currentTask && room.currentTask.id === taskId) {
+        room.currentTask = null;
+      }
+
+      return true;
+    }
+    return false;
+  }
+
+  selectTask(roomId, taskId) {
+    const room = this.getRoom(roomId);
+    if (room) {
+      const task = room.tasks.find((t) => t.id === taskId);
+      if (task) {
+        room.currentTask = task;
+        // При выборе новой задачи сбрасываем голосование
+        this.resetVotes(roomId);
+        return task;
+      }
+    }
+    return null;
+  }
+
+  getTasks(roomId) {
+    const room = this.getRoom(roomId);
+    return room ? room.tasks : [];
+  }
+
+  getCurrentTask(roomId) {
+    const room = this.getRoom(roomId);
+    return room ? room.currentTask : null;
   }
 }

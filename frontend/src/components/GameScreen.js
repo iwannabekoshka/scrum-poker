@@ -3,21 +3,24 @@ import UserList from './UserList.js';
 import VotingCards from './VotingCards.js';
 import Controls from './Controls.js';
 
-const GameScreen = ({ roomId, roomUsers, roomState, onVote, onReveal, onReset }) => {
-  const [allVoted, setAllVoted] = useState(false);
+const GameScreen = ({ roomId, roomUsers, roomState, allVoted, currentTask, onVote, onReveal, onReset }) => {
+  const [taskTitle, setTaskTitle] = useState('Оцените задачу');
 
   useEffect(() => {
-    const voted = roomUsers.filter(user => user.voted).length;
-    setAllVoted(voted > 0 && voted === roomUsers.length);
-  }, [roomUsers]);
+    if (currentTask) {
+      setTaskTitle(currentTask.title);
+    } else {
+      setTaskTitle('Оцените задачу');
+    }
+  }, [currentTask]);
 
   return (
     <div className="game-screen">
       <header className="game-header">
         <h2>Комната: <span className="room-id">{roomId}</span></h2>
-        <div className="task">{roomState.task}</div>
+        <div className="task">{taskTitle}</div>
         <div className="connection-status">
-          Участников: {roomUsers.length}<br/>
+          Участников: {roomUsers.length}
           {allVoted && !roomState.revealed && ' • Все проголосовали!'}
         </div>
       </header>

@@ -7,6 +7,9 @@ export const useSocket = () => {
   const [roomUsers, setRoomUsers] = useState([]);
   const [roomState, setRoomState] = useState({ revealed: false, task: '' });
   const [allVoted, setAllVoted] = useState(false);
+  const [tasks, setTasks] = useState([]);
+  const [currentTask, setCurrentTask] = useState(null);
+  const [taskError, setTaskError] = useState('');
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -25,7 +28,6 @@ export const useSocket = () => {
     socketRef.current.on('user-joined', (users) => {
       console.log('👥 Users updated:', users);
       setRoomUsers(users);
-      // При подключении новых пользователей пересчитываем allVoted
       const allVotedCheck = users.length > 0 && users.every(user => user.voted);
       console.log('All voted after user joined:', allVotedCheck);
       setAllVoted(allVotedCheck);
@@ -34,21 +36,17 @@ export const useSocket = () => {
     socketRef.current.on('user-voted', (data) => {
       console.log('🗳️ User voted data:', data);
       
-      // ФИКС: Обрабатываем разные форматы данных
       if (data && data.users) {
-        // Новый формат: { username, users }
         setRoomUsers(data.users);
         const allVotedCheck = data.users.length > 0 && data.users.every(user => user.voted);
         console.log('All voted check (new format):', allVotedCheck);
         setAllVoted(allVotedCheck);
       } else if (Array.isArray(data)) {
-        // Старый формат: массив пользователей
         setRoomUsers(data);
         const allVotedCheck = data.length > 0 && data.every(user => user.voted);
         console.log('All voted check (array format):', allVotedCheck);
         setAllVoted(allVotedCheck);
       } else {
-        // Только имя пользователя - пересчитываем на основе текущего состояния
         console.log('User voted (name only):', data);
         const allVotedCheck = roomUsers.length > 0 && roomUsers.every(user => user.voted);
         console.log('All voted check (current state):', allVotedCheck);
@@ -65,7 +63,7 @@ export const useSocket = () => {
       console.log('🃏 Votes revealed');
       setRoomUsers(users);
       setRoomState(prev => ({ ...prev, revealed: true }));
-      setAllVoted(true); // После раскрытия все равно считаем что все проголосовали
+      setAllVoted(true);
     });
 
     socketRef.current.on('votes-reset', (users) => {
@@ -83,10 +81,40 @@ export const useSocket = () => {
     socketRef.current.on('user-left', (users) => {
       console.log('👋 User left, remaining users:', users);
       setRoomUsers(users);
-      // При уходе пользователя перепроверяем allVoted
       const allVotedCheck = users.length > 0 && users.every(user => user.voted);
       console.log('All voted after user left:', allVotedCheck);
       setAllVoted(allVotedCheck);
+    });
+
+    // Новые обработчики для задач
+    socketRef.current.on('tasks-updated', (tasks) => {
+      console.log('📋 Tasks updated:', tasks);
+      setTasks(tasks);
+    });
+
+    socketRef.current.on('task-added', (data) => {
+      console.log('➕ Task added:', data);
+      setTasks(data.tasks);
+    });
+
+    socketRef.current.on('task-deleted', (data) => {
+      console.log('➖ Task deleted:', data);
+      setTasks(data.tasks);
+      setCurrentTask(data.currentTask);
+    });
+
+    socketRef.current.on('task-selected', (data) => {
+      console.log('🎯 Task selected:', data);
+      setCurrentTask(data.task);
+      setRoomUsers(data.users);
+      setAllVoted(false);
+    });
+
+    socketRef.current.on('task-error', (errorMessage) => {
+      console.log('❌ Task error:', errorMessage);
+      setTaskError(errorMessage);
+      // Автоматически скрываем ошибку через 5 секунд
+      setTimeout(() => setTaskError(''), 5000);
     });
 
     return () => {
@@ -95,9 +123,7 @@ export const useSocket = () => {
     };
   }, []);
 
-  // ФИКС: Добавляем roomUsers в зависимости useEffect для корректного обновления
   useEffect(() => {
-    // При изменении roomUsers пересчитываем allVoted
     const allVotedCheck = roomUsers.length > 0 && roomUsers.every(user => user.voted);
     console.log('roomUsers changed, allVoted recalculated:', allVotedCheck);
     setAllVoted(allVotedCheck);
@@ -123,14 +149,41 @@ export const useSocket = () => {
     socketRef.current.emit('reset-votes');
   };
 
+  // Новые методы для задач
+  const addTask = (taskData) => {
+    console.log('Adding task:', taskData);
+    socketRef.current.emit('add-task', taskData);
+  };
+
+  const deleteTask = (taskId) => {
+    console.log('Deleting task:', taskId);
+    socketRef.current.emit('delete-task', taskId);
+  };
+
+  const selectTask = (taskId) => {
+    console.log('Selecting task:', taskId);
+    socketRef.current.emit('select-task', taskId);
+  };
+
+  const clearTaskError = () => {
+    setTaskError('');
+  };
+
   return {
     isConnected,
     roomUsers,
     roomState,
     allVoted,
+    tasks,
+    currentTask,
+    taskError,
     joinRoom,
     vote,
     revealVotes,
-    resetVotes
+    resetVotes,
+    addTask,
+    deleteTask,
+    selectTask,
+    clearTaskError
   };
 };

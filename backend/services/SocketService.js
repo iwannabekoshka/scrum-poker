@@ -31,6 +31,18 @@ export class SocketService {
       socket.on('disconnect', () => {
         this.handleDisconnect(socket);
       });
+
+      socket.on('add-task', (taskData) => {
+        this.handleAddTask(socket, taskData);
+      });
+
+      socket.on('delete-task', (taskId) => {
+        this.handleDeleteTask(socket, taskId);
+      });
+
+      socket.on('select-task', (taskId) => {
+        this.handleSelectTask(socket, taskId);
+      });
     });
   }
 
@@ -50,12 +62,16 @@ export class SocketService {
     socket.username = username;
 
     const users = this.roomService.getAllUsers(roomId);
+    const tasks = this.roomService.getTasks(roomId);
+    const currentTask = this.roomService.getCurrentTask(roomId);
+    
     console.log(`Room ${roomId} now has users:`, users.map(u => u.name));
     
     this.io.to(roomId).emit('user-joined', users);
+    this.io.to(roomId).emit('tasks-updated', tasks);
     this.io.to(roomId).emit('room-state', {
       revealed: room.revealed,
-      task: room.task
+      task: currentTask ? currentTask.title : 'Оцените задачу'
     });
   }
 
@@ -115,7 +131,60 @@ export class SocketService {
     this.roomService.removeUserFromRoom(roomId, socket.id);
     const users = this.roomService.getAllUsers(roomId);
     
-    // ФИКС: Отправляем обновленный список при отключении
     this.io.to(roomId).emit('user-left', users);
+  }
+
+  handleAddTask(socket, taskData) {
+    const roomId = socket.roomId;
+    if (!roomId) return;
+
+    const { title, youtrackUrl } = taskData;
+    const task = this.roomService.addTask(roomId, title, youtrackUrl);
+    
+    if (task) {
+      const tasks = this.roomService.getTasks(roomId);
+      this.io.to(roomId).emit('task-added', { task, tasks });
+    }
+  }
+
+  handleDeleteTask(socket, taskId) {
+    const roomId = socket.roomId;
+    if (!roomId) return;
+
+    try {
+      const success = this.roomService.deleteTask(roomId, taskId);
+      if (success) {
+        const tasks = this.roomService.getTasks(roomId);
+        const currentTask = this.roomService.getCurrentTask(roomId);
+        
+        this.io.to(roomId).emit('task-deleted', { 
+          taskId, 
+          tasks,
+          currentTask 
+        });
+      }
+    } catch (error) {
+      socket.emit('task-error', error.message);
+    }
+  }
+
+  handleSelectTask(socket, taskId) {
+    const roomId = socket.roomId;
+    if (!roomId) return;
+
+    const task = this.roomService.selectTask(roomId, taskId);
+    if (task) {
+      const users = this.roomService.getAllUsers(roomId);
+      
+      this.io.to(roomId).emit('task-selected', { 
+        task,
+        users 
+      });
+      
+      this.io.to(roomId).emit('room-state', {
+        revealed: false,
+        task: task.title
+      });
+    }
   }
 }
