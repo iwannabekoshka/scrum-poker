@@ -19,7 +19,9 @@ const GameScreen = ({
   availableScales,
   onScaleChange,
   scaleError,
-  onClearScaleError
+  onClearScaleError,
+  onThrowEmoji,
+  emojiEvent
 }) => {
   const [taskTitle, setTaskTitle] = useState('Оцените задачу');
   const formatTime = (time) => {
@@ -57,6 +59,8 @@ const GameScreen = ({
         users={roomUsers} 
         revealed={roomState.revealed} 
         currentUser={currentUser} // Передаем currentUser
+        onThrowEmoji={onThrowEmoji}
+        emojiEvent={emojiEvent}
       />
 
       <VotingCards 

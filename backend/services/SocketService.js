@@ -55,6 +55,10 @@ export class SocketService {
       socket.on('import-tasks', (payload) => {
         this.handleImportTasks(socket, payload);
       });
+
+      socket.on('throw-emoji', (payload) => {
+        this.handleThrowEmoji(socket, payload);
+      });
     });
   }
 
@@ -387,5 +391,39 @@ export class SocketService {
       scaleValues: scale.values,
       availableScales
     });
+  }
+
+  handleThrowEmoji(socket, payload) {
+    const roomId = socket.roomId;
+    if (!roomId) {
+      return;
+    }
+
+    const targetUserId =
+      typeof payload?.targetUserId === 'string' ? payload.targetUserId.trim() : null;
+
+    if (!targetUserId) {
+      return;
+    }
+
+    const room = this.roomService.getRoom(roomId);
+    if (!room || !room.users.has(targetUserId)) {
+      return;
+    }
+
+    const emoji =
+      typeof payload?.emoji === 'string' && payload.emoji.trim().length > 0
+        ? payload.emoji
+        : null;
+
+    const event = {
+      id: `${Date.now()}-${Math.random()}`,
+      targetUserId,
+      emoji,
+      senderUserId: socket.id,
+      senderName: socket.username || null
+    };
+
+    this.io.to(roomId).emit('emoji-thrown', event);
   }
 }

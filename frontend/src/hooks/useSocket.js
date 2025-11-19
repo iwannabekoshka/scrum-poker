@@ -22,6 +22,7 @@ export const useSocket = () => {
   const [currentUser, setCurrentUser] = useState(null); // Добавляем состояние текущего пользователя
   const [joinError, setJoinError] = useState('');
   const [scaleError, setScaleError] = useState('');
+  const [emojiEvent, setEmojiEvent] = useState(null);
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -221,6 +222,18 @@ export const useSocket = () => {
       setTimeout(() => setScaleError(''), 5000);
     });
 
+    socketRef.current.on('emoji-thrown', (eventPayload) => {
+      if (!eventPayload?.targetUserId) {
+        return;
+      }
+      const enrichedPayload = {
+        ...eventPayload,
+        receivedAt: Date.now()
+      };
+      console.log('✈️ Emoji thrown event:', enrichedPayload);
+      setEmojiEvent(enrichedPayload);
+    });
+
     return () => {
       console.log('🧹 Cleaning up socket connection...');
       socketRef.current.disconnect();
@@ -288,6 +301,17 @@ export const useSocket = () => {
     socketRef.current.emit('change-scale', scaleKey);
   };
 
+  const throwEmoji = (targetUserId, emoji) => {
+    if (!targetUserId) {
+      return;
+    }
+
+    socketRef.current.emit('throw-emoji', {
+      targetUserId,
+      emoji
+    });
+  };
+
   const clearTaskError = () => {
     setTaskError('');
   };
@@ -322,8 +346,10 @@ export const useSocket = () => {
     selectTask,
     updateTaskTime,
     changeScale,
+    throwEmoji,
     clearTaskError,
     clearJoinError,
-    clearScaleError
+    clearScaleError,
+    emojiEvent
   };
 };

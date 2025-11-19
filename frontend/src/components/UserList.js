@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useRef } from 'react';
+import React, { forwardRef, useCallback, useEffect, useRef } from 'react';
 import EmojiThrowLayer from './EmojiThrowLayer.js';
 
 const UserCard = forwardRef(
@@ -25,19 +25,31 @@ const UserCard = forwardRef(
 
 UserCard.displayName = 'UserCard';
 
-const UserList = ({ users, revealed, currentUser }) => {
+const UserList = ({ users, revealed, currentUser, onThrowEmoji, emojiEvent }) => {
   const userRefs = useRef(new Map());
   const throwLayerRef = useRef(null);
 
   const handleUserClick = useCallback((user) => {
-    const userNode = userRefs.current.get(user.id);
-    if (!userNode || !throwLayerRef.current?.throwAt) {
+    if (!user?.id || typeof onThrowEmoji !== 'function') {
+      return;
+    }
+
+    onThrowEmoji(user.id, user.emoji);
+  }, [onThrowEmoji]);
+
+  useEffect(() => {
+    if (!emojiEvent?.targetUserId || !throwLayerRef.current?.throwAt) {
+      return;
+    }
+
+    const userNode = userRefs.current.get(emojiEvent.targetUserId);
+    if (!userNode) {
       return;
     }
 
     const targetRect = userNode.getBoundingClientRect();
-    throwLayerRef.current.throwAt(targetRect, user.emoji);
-  }, []);
+    throwLayerRef.current.throwAt(targetRect, emojiEvent.emoji);
+  }, [emojiEvent]);
 
   return (
     <>

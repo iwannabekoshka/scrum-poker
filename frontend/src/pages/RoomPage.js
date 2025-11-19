@@ -26,6 +26,7 @@ const RoomPage = () => {
     currentUser,
     joinError,
     scaleError,
+    emojiEvent,
     importTasks,
     joinRoom,
     vote,
@@ -38,7 +39,8 @@ const RoomPage = () => {
     clearTaskError,
     clearJoinError,
     changeScale,
-    clearScaleError
+    clearScaleError,
+    throwEmoji
   } = useSocket();
 
   const handleJoinRoom = useCallback(
@@ -137,6 +139,8 @@ const RoomPage = () => {
             onScaleChange={changeScale}
             scaleError={scaleError}
             onClearScaleError={clearScaleError}
+            onThrowEmoji={throwEmoji}
+            emojiEvent={emojiEvent}
           />
         </div>
 
