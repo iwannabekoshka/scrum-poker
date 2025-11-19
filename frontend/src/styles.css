@@ -184,6 +184,7 @@ body {
 .user-name {
   font-weight: bold;
   margin-bottom: 5px;
+  user-select: none;
 }
 
 .you-badge {
