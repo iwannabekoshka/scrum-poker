@@ -12,14 +12,25 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 const server = http.createServer(app);
+
+// CORS configuration for production and development
+const isProduction = process.env.NODE_ENV === 'production';
+const allowedOrigins = isProduction 
+  ? true // Allow all origins in production (frontend and backend on same domain)
+  : 'http://localhost:3000';
+
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST"]
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true
+}));
 app.use(express.json());
 
 // REST API routes

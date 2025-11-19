@@ -16,7 +16,13 @@ export const useSocket = () => {
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
-    socketRef.current = io('http://localhost:5000');
+    // Use relative URL in production (same origin), localhost in development
+    // In production, frontend and backend are on the same domain
+    const socketUrl = process.env.NODE_ENV === 'production' 
+      ? window.location.origin // Use same origin in production
+      : process.env.REACT_APP_SOCKET_URL || 'http://localhost:5000';
+    console.log('🔌 Connecting to:', socketUrl);
+    socketRef.current = io(socketUrl);
 
     socketRef.current.on('connect', () => {
       console.log('✅ Socket connected');
