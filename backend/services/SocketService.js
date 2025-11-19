@@ -47,6 +47,10 @@ export class SocketService {
       socket.on('update-task-time', (payload) => {
         this.handleUpdateTaskTime(socket, payload);
       });
+
+      socket.on('change-scale', (scaleKey) => {
+        this.handleChangeScale(socket, scaleKey);
+      });
     });
   }
 
@@ -87,10 +91,7 @@ export class SocketService {
     
     this.io.to(normalizedRoomId).emit('user-joined', users);
     this.io.to(normalizedRoomId).emit('tasks-updated', tasks);
-    this.io.to(normalizedRoomId).emit('room-state', {
-      revealed: room.revealed,
-      task: currentTask ? currentTask.title : 'Оцените задачу'
-    });
+    this.emitRoomState(normalizedRoomId);
 
     if (currentTask) {
       socket.emit('current-task', currentTask);
@@ -231,10 +232,7 @@ export class SocketService {
         users 
       });
       
-      this.io.to(roomId).emit('room-state', {
-        revealed: false,
-        task: task.title
-      });
+      this.emitRoomState(roomId);
     }
   }
 
@@ -271,6 +269,45 @@ export class SocketService {
     this.io.to(roomId).emit('task-time-updated', {
       task: updatedTask,
       tasks,
+    });
+  }
+
+  handleChangeScale(socket, scaleKey) {
+    const roomId = socket.roomId;
+    if (!roomId) {
+      return;
+    }
+
+    try {
+      const normalizedScaleKey =
+        typeof scaleKey === 'string' ? scaleKey : String(scaleKey || '').trim();
+      if (!normalizedScaleKey) {
+        throw new Error('Не передан ключ шкалы');
+      }
+
+      this.roomService.changeScale(roomId, normalizedScaleKey);
+      this.emitRoomState(roomId);
+    } catch (error) {
+      socket.emit('scale-change-error', error.message || 'Не удалось сменить шкалу');
+    }
+  }
+
+  emitRoomState(roomId) {
+    const room = this.roomService.getRoom(roomId);
+    if (!room) {
+      return;
+    }
+
+    const currentTask = this.roomService.getCurrentTask(roomId);
+    const scale = this.roomService.getScale(roomId);
+    const availableScales = this.roomService.getAvailableScales();
+
+    this.io.to(roomId).emit('room-state', {
+      revealed: room.revealed,
+      task: currentTask ? currentTask.title : 'Оцените задачу',
+      scaleKey: scale.key,
+      scaleValues: scale.values,
+      availableScales
     });
   }
 }

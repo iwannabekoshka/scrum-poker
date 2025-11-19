@@ -1,5 +1,6 @@
 import { Room } from "../models/Room.js";
 import { Task } from '../models/Task.js';
+import { CARD_SCALES, DEFAULT_SCALE_KEY, getScaleByKey } from '../constants/cardScales.js';
 
 export class RoomService {
   constructor() {
@@ -52,8 +53,13 @@ export class RoomService {
     const room = this.getRoom(roomId);
     if (room && room.users.has(socketId)) {
       const user = room.users.get(socketId);
-      user.vote = vote;
-      user.voted = true;
+      if (vote === null || vote === undefined) {
+        user.vote = null;
+        user.voted = false;
+      } else {
+        user.vote = vote;
+        user.voted = true;
+      }
     }
     return room;
   }
@@ -84,6 +90,47 @@ export class RoomService {
       return Array.from(room.users.values());
     }
     return [];
+  }
+
+  hasActiveVotes(roomId) {
+    const room = this.getRoom(roomId);
+    if (!room) {
+      return false;
+    }
+
+    return Array.from(room.users.values()).some((user) => user.voted);
+  }
+
+  getScale(roomId) {
+    const room = this.getRoom(roomId);
+    if (!room) {
+      return getScaleByKey(DEFAULT_SCALE_KEY);
+    }
+
+    return getScaleByKey(room.scaleKey);
+  }
+
+  changeScale(roomId, scaleKey) {
+    const room = this.getRoom(roomId);
+    if (!room) {
+      throw new Error('Комната не найдена');
+    }
+
+    if (!CARD_SCALES[scaleKey]) {
+      throw new Error('Неизвестная шкала');
+    }
+
+    const hasVotes = this.hasActiveVotes(roomId);
+    if (hasVotes) {
+      throw new Error('Нельзя менять шкалу после того, как кто-то проголосовал');
+    }
+
+    room.scaleKey = scaleKey;
+    return getScaleByKey(scaleKey);
+  }
+
+  getAvailableScales() {
+    return Object.values(CARD_SCALES);
   }
 
   addTask(roomId, taskTitle, youtrackUrl) {

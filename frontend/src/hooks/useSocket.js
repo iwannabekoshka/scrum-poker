@@ -1,11 +1,19 @@
 import { useEffect, useRef, useState } from 'react';
 import io from 'socket.io-client';
 
+const DEFAULT_ROOM_STATE = {
+  revealed: false,
+  task: '',
+  scaleKey: null,
+  scaleValues: [],
+  availableScales: []
+};
+
 export const useSocket = () => {
   const socketRef = useRef(null);
   const [isConnected, setIsConnected] = useState(false);
   const [roomUsers, setRoomUsers] = useState([]);
-  const [roomState, setRoomState] = useState({ revealed: false, task: '' });
+  const [roomState, setRoomState] = useState(DEFAULT_ROOM_STATE);
   const [allVoted, setAllVoted] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [currentTask, setCurrentTask] = useState(null);
@@ -13,6 +21,7 @@ export const useSocket = () => {
   const [resetTrigger, setResetTrigger] = useState(0);
   const [currentUser, setCurrentUser] = useState(null); // Добавляем состояние текущего пользователя
   const [joinError, setJoinError] = useState('');
+  const [scaleError, setScaleError] = useState('');
 
   useEffect(() => {
     console.log('🔌 Initializing socket connection...');
@@ -121,7 +130,13 @@ export const useSocket = () => {
 
     socketRef.current.on('room-state', (state) => {
       console.log('🏠 Room state:', state);
-      setRoomState(state);
+      setRoomState((prev) => ({
+        ...prev,
+        ...state,
+        availableScales: state?.availableScales ?? prev.availableScales,
+        scaleValues: state?.scaleValues ?? prev.scaleValues,
+        scaleKey: state?.scaleKey ?? prev.scaleKey
+      }));
     });
 
     socketRef.current.on('user-left', (users) => {
@@ -200,6 +215,12 @@ export const useSocket = () => {
       setJoinError(errorMessage);
     });
 
+    socketRef.current.on('scale-change-error', (errorMessage) => {
+      console.log('⚠️ Scale change error:', errorMessage);
+      setScaleError(errorMessage);
+      setTimeout(() => setScaleError(''), 5000);
+    });
+
     return () => {
       console.log('🧹 Cleaning up socket connection...');
       socketRef.current.disconnect();
@@ -253,12 +274,21 @@ export const useSocket = () => {
     socketRef.current.emit('update-task-time', { taskId, time });
   };
 
+  const changeScale = (scaleKey) => {
+    console.log('Changing scale to:', scaleKey);
+    socketRef.current.emit('change-scale', scaleKey);
+  };
+
   const clearTaskError = () => {
     setTaskError('');
   };
 
   const clearJoinError = () => {
     setJoinError('');
+  };
+
+  const clearScaleError = () => {
+    setScaleError('');
   };
 
   return {
@@ -272,6 +302,7 @@ export const useSocket = () => {
     resetTrigger,
     currentUser, // Возвращаем currentUser
     joinError,
+    scaleError,
     joinRoom,
     vote,
     revealVotes,
@@ -280,7 +311,9 @@ export const useSocket = () => {
     deleteTask,
     selectTask,
     updateTaskTime,
+    changeScale,
     clearTaskError,
-    clearJoinError
+    clearJoinError,
+    clearScaleError
   };
 };

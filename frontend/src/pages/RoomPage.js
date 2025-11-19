@@ -25,6 +25,7 @@ const RoomPage = () => {
     resetTrigger,
     currentUser,
     joinError,
+    scaleError,
     joinRoom,
     vote,
     revealVotes,
@@ -34,7 +35,9 @@ const RoomPage = () => {
     selectTask,
     updateTaskTime,
     clearTaskError,
-    clearJoinError
+    clearJoinError,
+    changeScale,
+    clearScaleError
   } = useSocket();
 
   const handleJoinRoom = useCallback(
@@ -127,6 +130,12 @@ const RoomPage = () => {
             onVote={vote}
             onReveal={revealVotes}
             onReset={resetVotes}
+            scaleKey={roomState.scaleKey}
+            scaleValues={roomState.scaleValues}
+            availableScales={roomState.availableScales}
+            onScaleChange={changeScale}
+            scaleError={scaleError}
+            onClearScaleError={clearScaleError}
           />
         </div>
 

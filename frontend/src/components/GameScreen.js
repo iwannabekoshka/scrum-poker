@@ -13,7 +13,13 @@ const GameScreen = ({
   currentUser, // Добавляем currentUser
   onVote, 
   onReveal, 
-  onReset 
+  onReset,
+  scaleKey,
+  scaleValues,
+  availableScales,
+  onScaleChange,
+  scaleError,
+  onClearScaleError
 }) => {
   const [taskTitle, setTaskTitle] = useState('Оцените задачу');
   const formatTime = (time) => {
@@ -30,6 +36,8 @@ const GameScreen = ({
       setTaskTitle('Оцените задачу');
     }
   }, [currentTask]);
+
+  const hasActiveVotes = roomUsers.some((user) => user.voted);
 
   return (
     <div className="game-screen">
@@ -55,6 +63,13 @@ const GameScreen = ({
         onVote={onVote} 
         revealed={roomState.revealed}
         resetTrigger={resetTrigger}
+        scaleKey={scaleKey}
+        scaleValues={scaleValues}
+        availableScales={availableScales}
+        onScaleChange={onScaleChange}
+        scaleChangeDisabled={hasActiveVotes}
+        scaleError={scaleError}
+        onClearScaleError={onClearScaleError}
       />
 
       <Controls

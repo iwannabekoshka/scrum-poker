@@ -9,6 +9,7 @@ body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
   padding: 20px;
+  padding-top: 100px;
 }
 
 .app {
@@ -269,6 +270,13 @@ body {
   margin: 20px 0;
 }
 
+.no-cards {
+  width: 100%;
+  text-align: center;
+  color: #94a3b8;
+  font-style: italic;
+}
+
 .card {
   width: 60px;
   height: 90px;
@@ -296,6 +304,52 @@ body {
 .card:disabled {
   cursor: not-allowed;
   opacity: 0.6;
+}
+
+.scale-selector {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.scale-selector label {
+  font-weight: 600;
+}
+
+.scale-selector select {
+  padding: 10px 14px;
+  border: 2px solid #667eea;
+  border-radius: 8px;
+  font-size: 16px;
+  min-width: 280px;
+  background-color: white;
+}
+
+.scale-selector small {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.scale-error {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #ff6b6b;
+  font-size: 14px;
+  background: rgba(255, 107, 107, 0.1);
+  padding: 6px 12px;
+  border-radius: 6px;
+}
+
+.scale-error-close {
+  border: none;
+  background: transparent;
+  color: #ff6b6b;
+  font-size: 18px;
+  cursor: pointer;
+  line-height: 1;
 }
 
 /* Controls */
