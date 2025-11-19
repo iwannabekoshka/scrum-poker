@@ -144,6 +144,42 @@ export class RoomService {
     return null;
   }
 
+  replaceTasks(roomId, tasksData = []) {
+    const room = this.getRoom(roomId);
+    if (!room) {
+      return null;
+    }
+
+    const timestamp = Date.now();
+    const normalizedTasks = tasksData
+      .map((task, index) => {
+        const title = task?.title?.trim();
+        const youtrackUrl = task?.youtrackUrl?.trim() || '';
+        const idCandidate = task?.id?.toString().trim();
+
+        if (!title) {
+          return null;
+        }
+
+        const id =
+          idCandidate && idCandidate.length > 0
+            ? idCandidate
+            : `${timestamp}-${index}`;
+
+        const newTask = new Task(id, title, youtrackUrl);
+        newTask.time = task?.time ?? null;
+
+        return newTask;
+      })
+      .filter(Boolean);
+
+    room.tasks = normalizedTasks;
+    room.currentTask = null;
+    room.revealed = false;
+
+    return room.tasks;
+  }
+
   deleteTask(roomId, taskId) {
     const room = this.getRoom(roomId);
     if (room) {

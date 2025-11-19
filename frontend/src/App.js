@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import LoginScreen from './components/LoginScreen.js';
 import RoomPage from './pages/RoomPage.js';
+import HowToExportYoutrackTasks from './pages/HowToExportYoutrackTasks.js';
 
 const LandingPage = () => {
   const navigate = useNavigate();
@@ -31,6 +32,10 @@ function App() {
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/room/:roomId" element={<RoomPage />} />
+        <Route 
+          path="/how-to-export-youtrack-tasks" 
+          element={<HowToExportYoutrackTasks />} 
+        />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

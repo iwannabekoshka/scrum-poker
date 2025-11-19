@@ -259,6 +259,15 @@ export const useSocket = () => {
     socketRef.current.emit('add-task', taskData);
   };
 
+  const importTasks = (tasksPayload) => {
+    if (!Array.isArray(tasksPayload) || tasksPayload.length === 0) {
+      console.warn('Import skipped: no tasks payload provided');
+      return;
+    }
+    console.log('Importing tasks from CSV:', tasksPayload.length);
+    socketRef.current.emit('import-tasks', tasksPayload);
+  };
+
   const deleteTask = (taskId) => {
     console.log('Deleting task:', taskId);
     socketRef.current.emit('delete-task', taskId);
@@ -308,6 +317,7 @@ export const useSocket = () => {
     revealVotes,
     resetVotes,
     addTask,
+    importTasks,
     deleteTask,
     selectTask,
     updateTaskTime,

@@ -26,6 +26,7 @@ const RoomPage = () => {
     currentUser,
     joinError,
     scaleError,
+    importTasks,
     joinRoom,
     vote,
     revealVotes,
@@ -147,6 +148,7 @@ const RoomPage = () => {
             onDeleteTask={deleteTask}
             onSelectTask={selectTask}
             onUpdateTaskTime={updateTaskTime}
+            onImportTasks={importTasks}
           />
         </div>
       </div>

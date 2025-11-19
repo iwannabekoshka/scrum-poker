@@ -51,6 +51,10 @@ export class SocketService {
       socket.on('change-scale', (scaleKey) => {
         this.handleChangeScale(socket, scaleKey);
       });
+
+      socket.on('import-tasks', (payload) => {
+        this.handleImportTasks(socket, payload);
+      });
     });
   }
 
@@ -290,6 +294,80 @@ export class SocketService {
     } catch (error) {
       socket.emit('scale-change-error', error.message || 'Не удалось сменить шкалу');
     }
+  }
+
+  handleImportTasks(socket, payload) {
+    const roomId = socket.roomId;
+    if (!roomId) {
+      return;
+    }
+
+    const rawTasks = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload?.tasks)
+        ? payload.tasks
+        : [];
+
+    if (rawTasks.length === 0) {
+      socket.emit(
+        'task-error',
+        'Данный .csv файл не соответствует формату'
+      );
+      return;
+    }
+
+    const normalizedTasks = rawTasks
+      .map((task) => {
+        if (!task) {
+          return null;
+        }
+        const title = typeof task.title === 'string' ? task.title.trim() : '';
+        const youtrackUrl =
+          typeof task.youtrackUrl === 'string'
+            ? task.youtrackUrl.trim()
+            : '';
+        const id =
+          typeof task.id === 'string' && task.id.trim().length > 0
+            ? task.id.trim()
+            : null;
+
+        if (!title) {
+          return null;
+        }
+
+        return {
+          id,
+          title,
+          youtrackUrl
+        };
+      })
+      .filter(Boolean);
+
+    if (normalizedTasks.length === 0) {
+      socket.emit(
+        'task-error',
+        'Данный .csv файл не соответствует формату'
+      );
+      return;
+    }
+
+    const tasks = this.roomService.replaceTasks(roomId, normalizedTasks);
+
+    if (!tasks) {
+      socket.emit(
+        'task-error',
+        'Не удалось обновить список задач'
+      );
+      return;
+    }
+
+    this.roomService.resetVotes(roomId);
+    const users = this.roomService.getAllUsers(roomId);
+
+    this.io.to(roomId).emit('tasks-updated', tasks);
+    this.io.to(roomId).emit('current-task', null);
+    this.io.to(roomId).emit('votes-reset', users);
+    this.emitRoomState(roomId);
   }
 
   emitRoomState(roomId) {
