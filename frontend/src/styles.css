@@ -144,30 +144,43 @@ body {
 
 /* Users List */
 .users-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  padding: 20px;
-  background: #f8f9fa;
   position: relative;
   z-index: 1;
+
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  padding: 20px;
+
+  background: #f8f9fa;
 }
 
 /* Стили для списка пользователей */
 .user {
-  background: white;
+  position: relative;
   padding: 15px;
-  border-radius: 10px;
+  width: 100px;
+  min-height: 150px;
+
   text-align: center;
+
+  background: white;
+  border-radius: 10px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   border: 2px solid transparent;
   transition: all 0.3s ease;
-  position: relative;
+
   cursor: pointer;
 }
 
 .user.voted {
   border-color: #28a745;
+}
+@media (min-width: 992px) {
+  .user.voted {
+    transform: translateY(-10px);
+  }
 }
 
 .user.current-user {
