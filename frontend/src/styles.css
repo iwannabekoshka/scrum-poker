@@ -159,7 +159,7 @@ body {
 .user {
   position: relative;
   padding: 15px;
-  width: 100px;
+  width: 125px;
   min-height: 150px;
 
   text-align: center;
@@ -173,6 +173,12 @@ body {
   cursor: pointer;
 }
 
+.user.current-user {
+  border-color: #667eea;
+  background: #f0f4ff;
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
 .user.voted {
   border-color: #28a745;
 }
@@ -182,16 +188,13 @@ body {
   }
 }
 
-.user.current-user {
-  border-color: #667eea;
-  background: #f0f4ff;
-  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
-}
+
 
 .user-name {
   font-weight: bold;
   margin-bottom: 5px;
   user-select: none;
+  word-break: break-all;
 }
 
 .you-badge {
