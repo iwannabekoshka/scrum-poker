@@ -41,6 +41,7 @@ const UserList = ({ users, revealed, currentUser, onThrowEmoji, emojiEvent }) =>
     }
 
     // TODO: добавить выбор емоджи для броска
+    // TODO: добавить синхронизацию эмоджи между юзерами (размер не синкается)
     onThrowEmoji(user.id, null);
   }, [onThrowEmoji]);
 
