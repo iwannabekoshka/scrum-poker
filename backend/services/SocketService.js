@@ -1,3 +1,5 @@
+import { parse } from "cookie";
+
 import { RoomService } from './RoomService.js';
 import { User } from '../models/User.js';
 
@@ -78,7 +80,10 @@ export class SocketService {
       room = this.roomService.createRoom(normalizedRoomId);
     }
 
-    const user = new User(socket.id, normalizedUsername);
+    const cookies = parse(socket.request.headers.cookie || "No cookies");
+    const isAdmin = Boolean(cookies.isAdmin);
+
+    const user = new User(socket.id, normalizedUsername, isAdmin);
 
     try {
       this.roomService.addUserToRoom(normalizedRoomId, user);

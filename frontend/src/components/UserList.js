@@ -35,7 +35,7 @@ const UserList = ({ users, revealed, currentUser, onThrowEmoji, emojiEvent }) =>
       return;
     }
 
-    if (user.name === "Danya") {
+    if (user.isAdmin) {
       alert("Не на того напал :)");
       return;
     }

@@ -1,7 +1,8 @@
 export class User {
-  constructor(id, name) {
+  constructor(id, name, isAdmin) {
     this.id = id;
     this.name = name;
+    this.isAdmin = isAdmin; 
     this.vote = null;
     this.voted = false;
     this.emoji = this.getRandomEmoji();
