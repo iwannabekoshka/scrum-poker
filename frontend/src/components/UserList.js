@@ -35,6 +35,11 @@ const UserList = ({ users, revealed, currentUser, onThrowEmoji, emojiEvent }) =>
       return;
     }
 
+    if (user.name === "Danya") {
+      alert("Не на того напал :)");
+      return;
+    }
+
     // TODO: добавить выбор емоджи для броска
     onThrowEmoji(user.id, null);
   }, [onThrowEmoji]);
