@@ -98,19 +98,6 @@ const RoomPage = () => {
 
   return (
     <div className="app">
-      <div className="connection-indicator">
-        <div className="user-info">
-          Вы: <strong>{currentUser?.name || lastTriedUsername}</strong>
-        </div>
-        Статус: {isConnected ? '✅ Подключено' : '❌ Отключено'}
-        {allVoted && (
-          <span style={{ marginLeft: '10px', color: 'green' }}>✓ Все проголосовали</span>
-        )}
-        <button onClick={handleLeaveRoom} className="return-btn">
-          Выйти
-        </button>
-      </div>
-
       {taskError && (
         <div className="error-notification">
           {taskError}
