@@ -26,7 +26,17 @@ const EmojiProjectile = ({
 
     let animationFrame;
     let startTime = null;
-    const { start, end } = projectile;
+    let { start, end } = projectile;
+
+    // FIXME: без поправки на размеры элемента он прилетает левым верхним углом
+    // в центр карточки. Через transform-origin поправить не получилось :(
+    // Почему делить на 4, а не на 2, тоже не понял, зато теперь центр эмоджи летит 
+    // в центр карточки
+    const widthCorrection = element.getBoundingClientRect().width / 4;
+    const heightCorrection = element.getBoundingClientRect().height / 4;
+    end.x = end.x - widthCorrection;
+    end.y = end.y - heightCorrection;
+
     const arcHeight = Math.max(80, Math.abs(end.x - start.x) * 0.25);
 
     const animate = (timestamp) => {
@@ -69,7 +79,7 @@ const EmojiProjectile = ({
   }, [projectile, duration, dropDuration, onComplete]);
 
   return (
-    <span ref={elementRef} className="emoji-projectile">
+    <span ref={elementRef} className={`emoji-projectile ${projectile.isLarge && "emoji-projectile--big"}`}>
       {projectile.emoji}
     </span>
   );
@@ -115,11 +125,14 @@ const EmojiThrowLayer = forwardRef(({ defaultEmoji = DEFAULT_EMOJI }, ref) => {
         y: endPosition.y + (Math.random() * 160 - 80)
       };
 
+      const isLarge = Math.random() > 0.9;
+
       const projectile = {
         id: `${Date.now()}-${Math.random()}`,
         emoji: emoji || defaultEmoji,
         start: startPosition,
-        end: endPosition
+        end: endPosition,
+        isLarge
       };
 
       setProjectiles((prev) => [...prev, projectile]);
