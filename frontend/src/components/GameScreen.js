@@ -24,7 +24,7 @@ const GameScreen = ({
   onThrowEmoji,
   emojiEvent
 }) => {
-  const [taskTitle, setTaskTitle] = useState('Оцените задачу');
+  const [taskTitle, setTaskTitle] = useState('Крутая задача');
   const formatTime = (time) => {
     if (time === null || time === undefined || time === '') {
       return '—';
@@ -36,7 +36,7 @@ const GameScreen = ({
     if (currentTask) {
       setTaskTitle(currentTask.title);
     } else {
-      setTaskTitle('Оцените задачу');
+      setTaskTitle('Крутая задача');
     }
   }, [currentTask]);
 
@@ -64,10 +64,7 @@ const GameScreen = ({
             title="Копировать ссылку комнаты"
             onClick={onCopyLink}>🔗</button>
         </h2>
-        <div className="task">{taskTitle}</div>
-        <div className="task-time">
-          ⏱ Оценка: {currentTask ? formatTime(currentTask.time) : '—'}
-        </div>
+
         <div className="connection-status">
           Участников: {roomUsers.length}
           {allVoted && !roomState.revealed && ' • Все проголосовали!'}
@@ -81,6 +78,29 @@ const GameScreen = ({
         onThrowEmoji={onThrowEmoji}
         emojiEvent={emojiEvent}
       />
+
+      <div class="task-section">
+        <div id="table">
+          <div className="task-title">{taskTitle}</div>
+
+          <div className="task-time">
+            ⏱ Оценка: {currentTask ? formatTime(currentTask.time) : '—'}
+          </div>
+
+          {currentTask && currentTask.youtrackUrl && (
+            <div className="task-url">
+              <a 
+                href={currentTask.youtrackUrl} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                🔗 YouTrack
+              </a>
+            </div>
+          )}
+        </div>
+      </div>
 
       <VotingCards 
         onVote={onVote} 

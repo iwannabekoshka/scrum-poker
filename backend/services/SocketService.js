@@ -386,7 +386,7 @@ export class SocketService {
 
     this.io.to(roomId).emit('room-state', {
       revealed: room.revealed,
-      task: currentTask ? currentTask.title : 'Оцените задачу',
+      task: currentTask ? currentTask.title : 'Крутая задача',
       scaleKey: scale.key,
       scaleValues: scale.values,
       availableScales

@@ -130,9 +130,8 @@ body {
   font-weight: bold;
 }
 
-.task {
+.task-title {
   font-size: 1.2em;
-  margin-top: 10px;
   font-weight: bold;
 }
 
@@ -205,6 +204,22 @@ body {
   font-weight: bold;
   color: #667eea;
   font-size: 1.2em;
+}
+
+.task-section {
+  padding-top: 20px;
+  padding-bottom: 20px;
+  background: #f8f9fa;
+}
+
+#table {
+  padding: 20px;
+  margin-inline: auto;
+  max-width: 500px;
+
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .emoji-layer {
@@ -570,6 +585,11 @@ body {
   font-weight: 500;
   margin-bottom: 5px;
   word-break: break-word;
+  text-align: center;
+}
+
+.task-time {
+  text-align: center;
 }
 
 .task-url {
