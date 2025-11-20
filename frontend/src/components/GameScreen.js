@@ -47,9 +47,9 @@ const GameScreen = ({
 
     try {
       await setCipboard(roomUrl);
-      alert("Ссылка скопирована!")
+      alert("Скопировано успешно!");
     } catch (error) {
-      alert("Произошла ошибка при копировании")
+      alert(error.message);
     }
   }
 
