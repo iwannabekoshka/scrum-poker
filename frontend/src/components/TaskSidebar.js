@@ -202,14 +202,14 @@ const TaskSidebar = ({
           >
             {isImporting ? 'Импортируем...' : 'Импортировать YouTrack .csv'}
           </button>
-          <button
-            type="button"
+          <a
+            href="/how-to-export-youtrack-tasks/"
+            target="_blank"
             className="import-info-btn"
             title="Как выгрузить задачи из YouTrack"
-            onClick={handleOpenHowTo}
           >
             ℹ️
-          </button>
+          </a>
         </div>
         {importError && (
           <div className="import-error">
