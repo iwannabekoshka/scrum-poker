@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import UserList from './UserList.js';
 import VotingCards from './VotingCards.js';
 import Controls from './Controls.js';
+import { setCipboard } from '../utils/setClipboard.js';
 
 const GameScreen = ({ 
   roomId, 
@@ -10,7 +11,7 @@ const GameScreen = ({
   allVoted, 
   currentTask, 
   resetTrigger,
-  currentUser, // Добавляем currentUser
+  currentUser,
   onVote, 
   onReveal, 
   onReset,
@@ -41,10 +42,28 @@ const GameScreen = ({
 
   const hasActiveVotes = roomUsers.some((user) => user.voted);
 
+  async function onCopyLink(e) {
+    const roomUrl = window.location.href;
+
+    try {
+      await setCipboard(roomUrl);
+      alert("Ссылка скопирована!")
+    } catch (error) {
+      alert("Произошла ошибка при копировании")
+    }
+  }
+
   return (
     <div className="game-screen">
       <header className="game-header">
-        <h2>Комната: <span className="room-id">{roomId}</span></h2>
+        <h2>
+          Комната: <span className="room-id">{roomId}</span>
+
+          <button 
+            className="button-icon" 
+            title="Копировать ссылку комнаты"
+            onClick={onCopyLink}>🔗</button>
+        </h2>
         <div className="task">{taskTitle}</div>
         <div className="task-time">
           ⏱ Оценка: {currentTask ? formatTime(currentTask.time) : '—'}

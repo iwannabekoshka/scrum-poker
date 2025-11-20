@@ -131,6 +131,14 @@ body {
   text-align: center;
 }
 
+.game-header h2 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .room-id {
   font-weight: bold;
 }
@@ -675,4 +683,14 @@ body {
   .task-sidebar {
     max-height: none;
   }
+}
+
+.button-icon {
+  background-color: transparent;
+  border: none;
+
+  font-size: 1rem;
+  color: white;
+
+  cursor: pointer;
 }
