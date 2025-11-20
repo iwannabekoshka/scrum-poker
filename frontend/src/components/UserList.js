@@ -11,8 +11,9 @@ const UserCard = forwardRef(
       onClick={onClick}
     >
       <div className="user-name">
-        {user.name}
-        {isCurrentUser && <span className="you-badge"> (Вы)</span>}
+        {user.emoji}
+        <br />
+        {user.name} {isCurrentUser && <span className="you-badge"> (Вы)</span>}
       </div>
       {user.voted && (
         <div className="user-vote">
@@ -34,7 +35,8 @@ const UserList = ({ users, revealed, currentUser, onThrowEmoji, emojiEvent }) =>
       return;
     }
 
-    onThrowEmoji(user.id, user.emoji);
+    // TODO: добавить выбор емоджи для броска
+    onThrowEmoji(user.id, null);
   }, [onThrowEmoji]);
 
   useEffect(() => {
