@@ -421,10 +421,16 @@ export class SocketService {
         ? payload.emoji
         : null;
 
+    // Генерируем параметры emoji на сервере для синхронизации между всеми пользователями
+    const emojiParams = {
+      emoji,
+      isLarge: Math.random() > 0.9
+    };
+
     const event = {
       id: `${Date.now()}-${Math.random()}`,
       targetUserId,
-      emoji,
+      emojiParams,
       senderUserId: socket.id,
       senderName: socket.username || null
     };

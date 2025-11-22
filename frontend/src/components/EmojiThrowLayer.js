@@ -108,7 +108,7 @@ const EmojiThrowLayer = forwardRef(({ defaultEmoji = DEFAULT_EMOJI }, ref) => {
   }, []);
 
   const launchProjectile = useCallback(
-    (targetRect, emoji) => {
+    (targetRect, emojiParams = {}) => {
       if (!targetRect || typeof window === 'undefined') {
         return;
       }
@@ -125,14 +125,12 @@ const EmojiThrowLayer = forwardRef(({ defaultEmoji = DEFAULT_EMOJI }, ref) => {
         y: endPosition.y + (Math.random() * 160 - 80)
       };
 
-      const isLarge = Math.random() > 0.9;
-
       const projectile = {
         id: `${Date.now()}-${Math.random()}`,
-        emoji: emoji || defaultEmoji,
+        emoji: emojiParams.emoji || defaultEmoji,
         start: startPosition,
         end: endPosition,
-        isLarge
+        isLarge: emojiParams.isLarge || false
       };
 
       setProjectiles((prev) => [...prev, projectile]);
@@ -143,8 +141,8 @@ const EmojiThrowLayer = forwardRef(({ defaultEmoji = DEFAULT_EMOJI }, ref) => {
   useImperativeHandle(
     ref,
     () => ({
-      throwAt(targetRect, emoji) {
-        launchProjectile(targetRect, emoji);
+      throwAt(targetRect, emojiParams) {
+        launchProjectile(targetRect, emojiParams);
       }
     }),
     [launchProjectile]
